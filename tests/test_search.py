@@ -14,7 +14,7 @@ def synthetic_pdf_path(tmp_path_factory):
     page1 = doc.new_page()
     page1.insert_text((50, 50), "This is a simple test document.", fontsize=12)
     page1.insert_text((50, 100), "The warranty on this battery replacement is valid for three years.", fontsize=12)
-    page1.insert_text((50, 150), "Short text.", fontsize=12) # Will be ignored because length < 30
+    page1.insert_text((50, 150), "Short text.", fontsize=12) # Will be included because length >= 10
 
     # Page 2
     page2 = doc.new_page()
@@ -30,8 +30,8 @@ def test_indexer_extraction(synthetic_pdf_path):
     indexer = Indexer()
     index, embeddings = indexer.index_pdf(synthetic_pdf_path)
 
-    # We expect 4 blocks (length >= 30)
-    assert len(index) == 4
+    # We expect 5 blocks (length >= 10, "Short text." is 11 chars)
+    assert len(index) == 5
 
     # Check if text is correctly extracted
     texts = [item["text"] for item in index]
@@ -46,7 +46,7 @@ def test_indexer_embeddings(synthetic_pdf_path):
 
     # Check embedding shape
     assert embeddings is not None
-    assert embeddings.shape == (4, 256) # 4 blocks, 256 dims (truncate_dim=256)
+    assert embeddings.shape == (5, 256) # 5 blocks, 256 dims (truncate_dim=256)
 
     # Check model device
     assert indexer.model.device.type == "cpu"
