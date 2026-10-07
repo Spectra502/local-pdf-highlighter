@@ -117,11 +117,14 @@ class PDFSearchApp:
         threading.Thread(target=self._index_pdf_thread, args=(file_path,), daemon=True).start()
 
     def _index_pdf_thread(self, file_path):
+        import traceback
         try:
             self.indexer.index_pdf(file_path, progress_callback=self._update_progress)
             self.root.after(0, self._indexing_complete)
         except Exception as e:
-            self.root.after(0, lambda: self._indexing_error(str(e)))
+            traceback.print_exc()
+            error_str = str(e)
+            self.root.after(0, lambda e_str=error_str: self._indexing_error(e_str))
 
     def _update_progress(self, value):
         self.root.after(0, lambda: self._set_progress(value))

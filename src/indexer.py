@@ -37,7 +37,7 @@ class Indexer:
                 # block_type 0 is text
                 if len(block) >= 7 and block[6] == 0:
                     text = block[4].strip()
-                    if len(text) >= 30:
+                    if len(text) >= 10:
                         bbox = block[:4]
 
                         self.index.append({
